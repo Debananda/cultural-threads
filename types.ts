@@ -6,8 +6,13 @@ export interface Product {
   isFeatured: boolean;
   size: Size;
   color: Color;
-  images: Image[]
-};
+  images: Image[];
+}
+
+export interface CartItemType {
+  product: Product;
+  quantity: number;
+}
 
 export interface Image {
   id: string;
@@ -18,22 +23,22 @@ export interface Billboard {
   id: string;
   label: string;
   imageUrl: string;
-};
+}
 
 export interface Category {
   id: string;
   name: string;
   billboard: Billboard;
-};
+}
 
 export interface Size {
   id: string;
   name: string;
   value: string;
-};
+}
 
 export interface Color {
   id: string;
   name: string;
   value: string;
-};
+}

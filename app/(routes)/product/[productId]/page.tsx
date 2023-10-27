@@ -1,29 +1,43 @@
-import ProductList from '@/components/product-list'
-import Gallery from '@/components/gallery';
-import Info from '@/components/info';
-import getProduct from '@/actions/get-product';
-import getProducts from '@/actions/get-products';
-import Container from '@/components/ui/container';
+import ProductList from "@/components/product-list";
+import Gallery from "@/components/gallery";
+import Info from "@/components/info";
+import getProduct from "@/actions/get-product";
+import getProducts from "@/actions/get-products";
+import Container from "@/components/ui/container";
+import { Metadata, ResolvingMetadata } from "next";
 
 export const revalidate = 0;
 
 interface ProductPageProps {
   params: {
     productId: string;
-  },
+  };
 }
+export async function generateMetadata(
+  { params }: ProductPageProps,
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  // read route params
+  const id = params.productId;
 
-const ProductPage: React.FC<ProductPageProps> = async ({ 
-  params
- }) => {
+  // fetch data
   const product = await getProduct(params.productId);
-  const suggestedProducts = await getProducts({ 
-    categoryId: product?.category?.id
-  });
 
-  if (!product) {
-    return null;
-  }
+  // optionally access and extend (rather than replace) parent metadata
+  const previousImages = (await parent).openGraph?.images || [];
+
+  return {
+    title: product.name,
+    openGraph: {
+      images: [product.images[0].url, ...previousImages],
+    },
+  };
+}
+const ProductPage: React.FC<ProductPageProps> = async ({ params }) => {
+  const product = await getProduct(params.productId);
+  const suggestedProducts = await getProducts({
+    categoryId: product?.category?.id,
+  });
 
   return (
     <div className="bg-white">
@@ -39,8 +53,8 @@ const ProductPage: React.FC<ProductPageProps> = async ({
           <ProductList title="Related Items" items={suggestedProducts} />
         </div>
       </Container>
-    </div>  
-  )
-}
+    </div>
+  );
+};
 
 export default ProductPage;
